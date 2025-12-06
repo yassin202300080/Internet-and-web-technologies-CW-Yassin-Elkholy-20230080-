@@ -35,6 +35,11 @@ db.serialize(() => {
         if (err) console.log("error creating enrollments table:", err.message);
         else console.log("enrollments table ready");
     });
+
+    db.run(db_access.CreateAssignmentTable, (err) => {
+        if (err) console.log("Error creating Assignments table:", err.message);
+        else console.log("Assignments Table Ready");
+    });
 });
 
 //use routes
