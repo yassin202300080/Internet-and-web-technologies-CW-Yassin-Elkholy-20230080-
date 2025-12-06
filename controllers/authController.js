@@ -45,3 +45,42 @@ const register = (req, res) => {
         });
     });
 };
+
+
+//user login
+const login = (req, res) => {
+    const { email, password } = req.body;
+
+    const query = `SELECT * FROM users WHERE email = ?`;
+    
+    db.get(query, [email], (err, user) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (!user) return res.status(401).json({ error: "Invalid email or password" });
+
+        // compare password
+        bcrypt.compare(password, user.password_hash, (err, isMatch) => {
+            if (err) return res.status(500).json({ error: "Error when comparing passwords" });
+            if (!isMatch) return res.status(401).json({ error: "invalid email or password" });
+
+            // generate token
+            const token = signToken(user.user_id, user.role);
+
+            // set cookie
+            res.cookie('token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+
+            res.status(200).json({
+                message: "Login successful",
+                token: token,
+                user: { id: user.user_id, email: user.email, role: user.role }
+            });
+        });
+    });
+};
+
+// 3. LOGOUT USER
+const logout = (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: "Logged out successfully" });
+};
+
+module.exports = { register, login, logout };
