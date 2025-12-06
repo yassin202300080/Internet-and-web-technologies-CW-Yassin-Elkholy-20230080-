@@ -8,6 +8,7 @@ const db = db_access.db;
 
 //import routes 
 const authRoutes = require('./routes/authRoutes');
+const classroomRoutes = require('./routes/classroomRoutes');
 
 // load config
 dotenv.config();
@@ -44,6 +45,7 @@ db.serialize(() => {
 
 //use routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/classrooms', classroomRoutes);
 
 app.get('/', (req, res) => {
     res.send('FlashEdu backend  running');
