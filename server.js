@@ -3,6 +3,9 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
+const db_access = require('./models/db.js');
+const db = db_access.db;
+
 // load config
 dotenv.config();
 const app = express();
@@ -13,6 +16,23 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+//creating tables for database 
+db.serialize(() => {
+    db.run(db_access.CreateUserTable, (err) => {
+        if (err) console.log("error creating users table:", err.message);
+        else console.log("users table ready");
+    });
+    
+    db.run(db_access.CreateClassroomTable, (err) => {
+        if (err) console.log("error creating classrooms table:", err.message);
+        else console.log("classrooms table ready");
+    });
+
+    db.run(db_access.CreateEnrollmentTable, (err) => {
+        if (err) console.log("error creating enrollments table:", err.message);
+        else console.log("enrollments table ready");
+    });
+});
 
 app.get('/', (req, res) => {
     res.send('FlashEdu backend  running');
