@@ -22,8 +22,17 @@ const CreateUserTable = `CREATE TABLE IF NOT EXISTS users (
 )`;
 
 //Classroom Table
-const CreateClassroomTable = `CREATE TABLE
-`;
+const CreateClassroomTable = `CREATE TABLE IF NOT EXISTS classrooms (
+    classroom_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    teacher_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    class_code TEXT UNIQUE NOT NULL,
+    schedule TEXT,
+    status TEXT DEFAULT 'active',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_id) REFERENCES users(user_id) ON DELETE CASCADE
+)`;
 
 
 
