@@ -10,9 +10,16 @@ const db = new sqlite.Database(path.resolve(__dirname, '../flashedu.db'), (err) 
     }
 });
 
-//User Table
-const CreateUserTable = `CREATE TABLE 
-`;
+//User Table 
+const CreateUserTable = `CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`;
 
 //Classroom Table
 const CreateClassroomTable = `CREATE TABLE
