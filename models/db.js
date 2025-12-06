@@ -1,4 +1,5 @@
 const sqlite = require('sqlite3').verbose();
+const { table } = require('console');
 const path = require('path');
 
 // Connecting to flash edu database
@@ -34,11 +35,20 @@ const CreateClassroomTable = `CREATE TABLE IF NOT EXISTS classrooms (
     FOREIGN KEY (teacher_id) REFERENCES users(user_id) ON DELETE CASCADE
 )`;
 
-
+//enrollment table
+const CreateEnrollmentTable = `CREATE TABLE IF NOT EXISTS enrollments (
+    enrollment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    classroom_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
+    enrolled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE(classroom_id, student_id)
+)`;
 
 module.exports = { 
     db, 
     CreateUserTable,
     CreateClassroomTable,
-    
+    CreateEnrollmentTable
 };
