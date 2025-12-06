@@ -6,6 +6,9 @@ const cors = require('cors');
 const db_access = require('./models/db.js');
 const db = db_access.db;
 
+//import routes 
+const authRoutes = require('./routes/authRoutes');
+
 // load config
 dotenv.config();
 const app = express();
@@ -33,6 +36,9 @@ db.serialize(() => {
         else console.log("enrollments table ready");
     });
 });
+
+//use routes
+app.use('/api/v1/auth', authRoutes);
 
 app.get('/', (req, res) => {
     res.send('FlashEdu backend  running');
