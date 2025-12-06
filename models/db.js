@@ -46,9 +46,22 @@ const CreateEnrollmentTable = `CREATE TABLE IF NOT EXISTS enrollments (
     UNIQUE(classroom_id, student_id)
 )`;
 
+//Assignments
+const CreateAssignmentTable = `CREATE TABLE IF NOT EXISTS assignments (
+    assignment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    classroom_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    due_date DATETIME NOT NULL,
+    max_points INTEGER DEFAULT 100,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id) ON DELETE CASCADE
+)`;
+
 module.exports = { 
     db, 
     CreateUserTable,
     CreateClassroomTable,
-    CreateEnrollmentTable
+    CreateEnrollmentTable,
+    CreateAssignmentTable 
 };
