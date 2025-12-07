@@ -41,6 +41,18 @@ const createClassroom = (req, res) => {
     });
 };
 
+//viewing classrooms 
+const listClassrooms = (req, res) => {
+    let query = "";
+    let params = [];
+
+    if (req.user.role === 'staff') {
+        //staff views created classes
+        query = `SELECT * FROM classrooms WHERE teacher_id = ?`;
+        params = [req.user.id];
+    }
+};
+   
 //join classroom for students 
 const joinClassroom = (req, res) => {
     if (req.user.role !== 'student') {
@@ -71,4 +83,4 @@ const joinClassroom = (req, res) => {
     });
 };
 
-module.exports = { createClassroom, joinClassroom };
+module.exports = { createClassroom, joinClassroom,listClassrooms };
