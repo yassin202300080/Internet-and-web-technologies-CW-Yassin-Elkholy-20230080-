@@ -27,3 +27,5 @@ const createAssignment = (req, res) => {
         });
     });
 };
+
+module.exports = { createAssignment };
