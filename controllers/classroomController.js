@@ -94,4 +94,15 @@ const joinClassroom = (req, res) => {
     });
 };
 
-module.exports = { createClassroom, joinClassroom,listClassrooms };
+//get classroom details by id 
+const getClassroomById = (req, res) => {
+    const id = req.params.id;
+    db.get(`SELECT * FROM classrooms WHERE classroom_id = ?`, [id], (err, row) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (!row) return res.status(404).json({ error: "Classroom not found" });
+        
+        res.status(200).json(row);
+    });
+};
+
+module.exports = { createClassroom, joinClassroom,listClassrooms, getClassroomById };
