@@ -50,7 +50,18 @@ const listClassrooms = (req, res) => {
         //staff views created classes
         query = `SELECT * FROM classrooms WHERE teacher_id = ?`;
         params = [req.user.id];
+    } else {
+        // Student views classes
+        query = `SELECT c.* FROM classrooms c 
+                 JOIN enrollments e ON c.classroom_id = e.classroom_id 
+                 WHERE e.student_id = ?`;
+        params = [req.user.id];
     }
+
+    db.all(query, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        res.status(200).json({ classrooms: rows });
+    });
 };
    
 //join classroom for students 
