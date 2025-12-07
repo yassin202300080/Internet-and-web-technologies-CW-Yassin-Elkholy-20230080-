@@ -58,10 +58,25 @@ const CreateAssignmentTable = `CREATE TABLE IF NOT EXISTS assignments (
     FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id) ON DELETE CASCADE
 )`;
 
+//Submissions 
+const CreateSubmissionTable = `CREATE TABLE IF NOT EXISTS submissions (
+    submission_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assignment_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
+    submission_text TEXT,
+    status TEXT DEFAULT 'submitted', -- 'submitted', 'graded'
+    grade INTEGER,
+    feedback TEXT,
+    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
+)`;
+
 module.exports = { 
     db, 
     CreateUserTable,
     CreateClassroomTable,
     CreateEnrollmentTable,
-    CreateAssignmentTable 
+    CreateAssignmentTable,
+    CreateSubmissionTable 
 };
