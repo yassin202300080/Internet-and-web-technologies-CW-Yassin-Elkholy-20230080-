@@ -41,6 +41,34 @@ const createClassroom = (req, res) => {
     });
 };
 
+//join classroom for students 
+const joinClassroom = (req, res) => {
+    if (req.user.role !== 'student') {
+        return res.status(403).json({ error: "Only students can join classrooms" });
+    }
 
+    const { classCode } = req.body;
+    if (!classCode) return res.status(400).json({ error: "Class code is required" });
 
-module.exports = { createClassroom };
+    //finding the classroom id using the code
+    db.get(`SELECT classroom_id FROM classrooms WHERE class_code = ?`, [classCode], (err, row) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (!row) return res.status(404).json({ error: "Invalid class code" });
+
+        const classroomId = row.classroom_id;
+
+        //enroll student
+        const enrollQuery = `INSERT INTO enrollments (classroom_id, student_id) VALUES (?, ?)`;
+        db.run(enrollQuery, [classroomId, req.user.id], function(err) {
+            if (err) {
+                if (err.message.includes("UNIQUE constraint failed")) {
+                    return res.status(400).json({ error: "You are already enrolled in this class" });
+                }
+                return res.status(500).json({ error: "Error joining class" });
+            }
+            res.status(200).json({ message: "Joined classroom successfully", classroomId: classroomId });
+        });
+    });
+};
+
+module.exports = { createClassroom, joinClassroom };
