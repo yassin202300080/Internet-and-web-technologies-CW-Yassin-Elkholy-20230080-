@@ -3,7 +3,9 @@ const {
     createClassroom, 
     listClassrooms, 
     joinClassroom, 
-    getClassroomById
+    getClassroomById,
+    updateClassroom,
+    deleteClassroom
 } = require('../controllers/classroomController');
 const verifyToken = require('../middleware/authMiddleware');
 
@@ -15,5 +17,8 @@ router.post('/',createClassroom);
 router.get('/', listClassrooms);         
 router.post('/join', joinClassroom);     
 router.get('/:id', getClassroomById);
+
+router.put('/:id', updateClassroom);
+router.delete('/:id', deleteClassroom);
 
 module.exports = router;

@@ -64,4 +64,15 @@ const updateAssignment = (req, res) => {
     });
 };
 
-module.exports = { createAssignment, listAssignments, updateAssignment };
+//get Single Assignment Details
+const getAssignmentById = (req, res) => {
+    const { id } = req.params;
+
+    db.get(`SELECT * FROM assignments WHERE assignment_id = ?`, [id], (err, row) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (!row) return res.status(404).json({ error: "Assignment not found" });
+
+        res.status(200).json({ assignment: row });
+    });
+};
+module.exports = { createAssignment, listAssignments, updateAssignment, getAssignmentById };

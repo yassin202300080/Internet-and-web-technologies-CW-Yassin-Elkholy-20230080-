@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const classroomRoutes = require('./routes/classroomRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // load config
 dotenv.config();
@@ -52,6 +53,7 @@ db.serialize(() => {
 
 //use routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/classrooms', classroomRoutes);
 app.use('/api/v1/assignments', assignmentRoutes);
 app.use('/api/v1/submissions', submissionRoutes);

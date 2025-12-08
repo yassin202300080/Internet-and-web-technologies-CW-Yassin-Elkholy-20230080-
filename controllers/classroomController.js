@@ -105,4 +105,40 @@ const getClassroomById = (req, res) => {
     });
 };
 
-module.exports = { createClassroom, joinClassroom,listClassrooms, getClassroomById };
+//update classroom 
+ const updateClassroom = (req, res) => {
+    if (req.user.role !== 'staff') return res.status(403).json({ error: "Access denied" });
+
+    const { id } = req.params;
+    const { name, description, schedule } = req.body;
+
+    //ensure staff own the class before updating
+    const query = `UPDATE classrooms SET name = ?, description = ?, schedule = ? WHERE classroom_id = ? AND teacher_id = ?`;
+    const params = [name, description, JSON.stringify(schedule), id, req.user.id];
+
+    db.run(query, params, function(err) {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (this.changes === 0) return res.status(404).json({ error: "Classroom not found or you are not the owner" });
+        
+        res.status(200).json({ message: "Classroom updated successfully" });
+    });
+};
+
+//Delete classroom
+const deleteClassroom = (req, res) => {
+    if (req.user.role !== 'staff') return res.status(403).json({ error: "Access denied" });
+
+    const { id } = req.params;
+
+    //remove assignments and enrollments
+    const query = `DELETE FROM classrooms WHERE classroom_id = ? AND teacher_id = ?`;
+
+    db.run(query, [id, req.user.id], function(err) {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (this.changes === 0) return res.status(404).json({ error: "Classroom not found or you are not the owner" });
+
+        res.status(200).json({ message: "Classroom deleted successfully" });
+    });
+};
+
+module.exports = { createClassroom, joinClassroom,listClassrooms, getClassroomById, updateClassroom, deleteClassroom };
