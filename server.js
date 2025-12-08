@@ -41,6 +41,11 @@ db.serialize(() => {
     db.run(db_access.CreateAssignmentTable, (err) => {
         if (err) console.log("Error creating Assignments table:", err.message);
         else console.log("Assignments Table Ready");
+
+        db.run(db_access.CreateSubmissionTable, (err) => {
+        if (err) console.log("Error creating Submissions table:", err.message);
+        else console.log("Submissions Table Ready");
+    });
     });
 });
 
