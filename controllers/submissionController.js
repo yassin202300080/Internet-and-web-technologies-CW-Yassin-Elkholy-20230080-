@@ -24,3 +24,49 @@ db.run(query, params, function(err) {
     });
 };
 
+//staff view submission 
+const getSubmissions = (req, res) => {
+    if (req.user.role !== 'staff')
+        return res.status(403).json({ error: "Access denied" });
+
+    const { assignmentId } = req.params;
+    //student submission details
+    const query = `
+        SELECT s.*, u.first_name, u.last_name, u.email 
+        FROM submissions s
+        JOIN users u ON s.student_id = u.user_id
+        WHERE s.assignment_id = ?
+    `;
+
+    db.all(query, [assignmentId], (err, rows) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+
+        res.status(200).json({ submissions: rows });
+    });
+};
+
+//grade submission and feedback 
+const gradeSubmission = (req, res) => {
+    if (req.user.role !== 'staff')
+        return res.status(403).json({ error: "Access denied" });
+
+    const { submissionId } = req.params;
+    const { grade, feedback } = req.body;
+
+    const query = `
+        UPDATE submissions
+        SET grade = ?, feedback = ?, status = 'graded'
+        WHERE submission_id = ?
+    `;
+
+    db.run(query, [grade, feedback, submissionId], function(err) {
+        if (err) return res.status(500).json({ error: "Database error" });
+
+        //if nothing was updated the submission Id doesn't exist
+        if (this.changes === 0) return res.status(404).json({ error: "Submission not found" });
+
+        res.status(200).json({ message: "Submission graded successfully" });
+    });
+};
+
+module.exports = { submitAssignment, getSubmissions, gradeSubmission };
