@@ -141,4 +141,49 @@ const deleteClassroom = (req, res) => {
     });
 };
 
-module.exports = { createClassroom, joinClassroom,listClassrooms, getClassroomById, updateClassroom, deleteClassroom };
+//Update and archive classroom
+const upateClassroom = (req, res) => {
+    if (req.user.role !== 'staff') return res.status(403).json({ error: "Access denied" });
+
+    const { id } = req.params;
+
+    const { name, description, schedule } = req.body;
+
+    db.get(`SELECT * FROM classrooms WHERE classroom_id = ? AND teacher_id = ?`, [id, req.user.id], (err, row) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (!row) return res.status(404).json({ error: "Classroom not found" });
+
+        // Use new value if sent, otherwise keep old value
+        const newName = name || row.name;
+        const newDesc = description || row.description;
+        const newSchedule = schedule ? JSON.stringify(schedule) : row.schedule;
+        //active or archived
+        const newStatus = status || row.status; 
+
+        const query = `UPDATE classrooms SET name = ?, description = ?, schedule = ?, status = ? WHERE classroom_id = ?`;
+        
+        db.run(query, [newName, newDesc, newSchedule, newStatus, id], function(err) {
+            if (err) return res.status(500).json({ error: "Database error" });
+            res.status(200).json({ message: "Classroom updated successfully" });
+        });
+    });
+};
+
+//archive classroom
+const archiveClassroom = (req, res) => {
+    //staff only can archive
+    if (req.user.role !== 'staff') return res.status(403).json({ error: "Access denied" });
+
+    const { id } = req.params;
+
+    //update satus to archived
+    const query = `UPDATE classrooms SET status = 'archived' WHERE classroom_id = ? AND teacher_id = ?`;
+
+    db.run(query, [id, req.user.id], function(err) {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (this.changes === 0) return res.status(404).json({ error: "Classroom not found or you are not the owner" });
+
+        res.status(200).json({ message: "Classroom archived successfully" });
+    });
+};
+module.exports = { createClassroom, joinClassroom,listClassrooms, getClassroomById, updateClassroom, deleteClassroom, archiveClassroom};

@@ -8,18 +8,31 @@ const submitAssignment = (req, res) => {
 
     const { assignmentId } = req.params;
     const { submissionText } = req.body;
-//empty submissions
-if (!submissionText)
-        return res.status(400).json({ error: "Submission text is required" });
-    const query = `INSERT INTO submissions (assignment_id, student_id, submission_text) VALUES (?, ?, ?)`;
-    const params = [assignmentId, req.user.id, submissionText];
-//Save submission in the database
-db.run(query, params, function(err) {
-        if (err) return res.status(500).json({ error: err.message });
 
-        res.status(201).json({
-            message: "Assignment submitted successfully",
-            submissionId: this.lastID
+    //empty submissions
+    if (!submissionText)
+        return res.status(400).json({ error: "Submission text is required" });
+
+    //check assignment and if deadline passed
+    db.get(`SELECT due_date FROM assignments WHERE assignment_id = ?`, [assignmentId], (err, row) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        if (!row) return res.status(404).json({ error: "Assignment not found" });
+
+        //Check deadline
+        const dueDate = new Date(row.due_date);
+        const now = new Date();
+
+        if (now > dueDate) {
+            return res.status(400).json({ error: "Deadline has passed. Submission rejected." }); 
+        }
+        
+        //insert submission
+        const query = `INSERT INTO submissions (assignment_id, student_id, submission_text) VALUES (?, ?, ?)`;
+        const params = [assignmentId, req.user.id, submissionText];
+
+        db.run(query, params, function(err) {
+            if (err) return res.status(500).json({ error: "Database error or already submitted" });
+            res.status(201).json({ message: "Assignment submitted successfully", submissionId: this.lastID });
         });
     });
 };
@@ -69,4 +82,4 @@ const gradeSubmission = (req, res) => {
     });
 };
 
-module.exports = { submitAssignment, getSubmissions, gradeSubmission };
+module.exports = { submitAssignment, getSubmissions, gradeSubmission};

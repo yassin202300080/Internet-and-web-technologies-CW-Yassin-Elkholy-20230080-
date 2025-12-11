@@ -5,7 +5,9 @@ const {
     joinClassroom, 
     getClassroomById,
     updateClassroom,
-    deleteClassroom
+    deleteClassroom,
+    archiveClassroom
+
 } = require('../controllers/classroomController');
 const verifyToken = require('../middleware/authMiddleware');
 
@@ -20,5 +22,6 @@ router.get('/:id', getClassroomById);
 
 router.put('/:id', updateClassroom);
 router.delete('/:id', deleteClassroom);
+router.patch('/:id/archive', archiveClassroom);
 
 module.exports = router;
